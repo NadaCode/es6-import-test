@@ -1,0 +1,22 @@
+{
+	"name": "test.json",
+	"short_array": [1, 2, 3, 6, 7, 8],
+	"obj": {
+		"a": 123,
+		"long_array": [
+			1,
+			2,
+			3,
+			6,
+			7,
+			8,
+			"asdasdas",
+			6,
+			7,
+			8,
+			"asdasdas",
+			"werwerwe",
+			"werwerweasdasdas"
+		]
+	}
+}
