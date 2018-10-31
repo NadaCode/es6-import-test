@@ -2,7 +2,7 @@
 
 ## Motivation
 
-I'm tired oh spending months of my time trying to understand and fix all webpack errors. I do not like when there is a very complex system of build tools that is extremely hard to understand. I also do not like extra bloat and I want my code to use native browser calls to test real es6+ performance instead of polyfill/transpiled performance.
+I'm tired of spending months of my time trying to understand and fix all webpack errors. I do not like when there is a very complex system of build tools that is extremely hard to understand. I also do not like extra bloat and I want my code to use native browser calls to test real es6+ performance instead of polyfill/transpiled performance.
 
 ## Project
 
@@ -36,7 +36,7 @@ I recommend lite-server (or any webserver) for serving the directory because all
 
 ## CommonJS to ES6 export
 
-Problem is that modern browsers do not support require -syntax at all and many libraries use only old cjs module.exports. Call ```yarn build:lib``` to create es6 version of that library (alredy done in repo). yarn build:lib needs to have cjs-to-es6 installed, add it using: ```yarn global add cjs-to-es6```.
+Problem is that modern browsers do not support require syntax at all and many libraries use only old cjs module.exports. Call ```yarn build:lib``` to create es6 version of that library (alredy done in repo). yarn build:lib needs to have cjs-to-es6 installed, add it using: ```yarn global add cjs-to-es6```.
 
 ## Test Rollup json import
 
