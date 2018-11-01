@@ -8,7 +8,7 @@ I'm tired of spending months of my time trying to understand and fix all webpack
 
 This is minimal project to test how to use modern javascript in Node and browsers without any polyfills or transpiling. It also shows how good and easy to understand Rollup is, see rollup.config.js.
 
-Open browser dev tools to see the code. Modern browsers use es6_test.js directly and Node + older browsers use bundle.js. See <https://jakearchibald.com/2017/es-modules-in-browsers/>.
+Open browser dev tools to see the code. Modern browsers use es6_test.js directly and Node + older browsers use bundle.js. See <https://medium.com/@kelin2025/writing-js-libraries-less-than-1tb-size-6342da0c006a> and <https://jakearchibald.com/2017/es-modules-in-browsers/>.
 Idea is to show **how simple and clean bundle.js** is. It has nothing extra, no webpack bloat.
 
 File index.html is using directly es6_test.js with fallback to bundle.js for old browsers. File index.html uses only bundle.js.
