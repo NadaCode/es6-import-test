@@ -6,7 +6,7 @@
 		"build": "rollup -c",
 		"build:lib": "node lib/make_es6_libray.js",
 		"test:node": "yarn build && node bundle.js",
-		"all": "yarn build && yarn test:node && open ./stats.html"
+		"all": "yarn test:node && open ./stats.html"
 	},
 	"dependencies": {
 		"json-stringify-pretty-compact": "^1.2.0"
