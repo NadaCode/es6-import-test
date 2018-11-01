@@ -46,6 +46,7 @@ export default {
 		format: 'iife', // iife, umd or cjs , all work for node
 		// sourcemap: process.env.NODE_ENV !== 'prod',
 		// globals: globals,
+		name: 'Test es6 Rollup',
 		moduleName: 'test_es6_rollup',
 	},
 }
