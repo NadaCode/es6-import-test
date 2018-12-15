@@ -1,4 +1,4 @@
-# Test ES6 with Rollup
+# Test ES6 native import with Rollup
 
 ## Motivation
 
