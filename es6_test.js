@@ -9,6 +9,17 @@ import stringify from './lib/json-stringify-pretty-compact.js'
 // import jsonObj from './test.json' // you need Rollup for this
 const jsonObj = {
 	name: 'test.json',
+	"table": [{
+		"record_type": [""],
+		"table": "person"
+	}],
+	parameter: {
+		"user_id": ""
+	},
+	field: ["per.json_data"],
+	query: [
+		["per.login_id", "=", "user_id"]
+	],
 	short_array: [1, 2, 3, 6, 7, 8],
 	obj: {
 		a: 123,
@@ -17,11 +28,14 @@ const jsonObj = {
 }
 
 const testStringifyPrettyCompact = (json, stringify) => {
-	let options = { maxLength: 80, indent: 2, }
+	let options = {
+		maxLength: 80,
+		indent: 2,
+	}
 	return stringify(json, options)
 }
 
-export function test (json, stringify) {
+export function test(json, stringify) {
 	const isNode = typeof window === 'undefined'
 	let jsonTxt = JSON.stringify(json)
 	console.log('jsonTxt:', jsonTxt)

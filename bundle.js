@@ -1,141 +1,153 @@
-(function () {
-	'use strict';
+var test_es6_rollup = (function (exports) {
+  'use strict';
 
-	/* ---------------------------------------------------------------------------------------------
-	 * es6_test_lib.js: json formatting and es6 rollup test
-	 *-------------------------------------------------------------------------------------------- */
+  function stringify (obj, options) {
+    options = options || {};
+    var indent = JSON.stringify([1], null, get(options, 'indent', 2)).slice(2, -3);
+    var addMargin = get(options, 'margins', false);
+    var maxLength = (indent === '' ? Infinity : get(options, 'maxLength', 80));
 
-	// https://github.com/lydell/json-stringify-pretty-compact
+    return (function _stringify (obj, currentIndent, reserved) {
+      if (obj && typeof obj.toJSON === 'function') {
+        obj = obj.toJSON();
+      }
 
-	const testStringifyPrettyCompact = (json, stringify) => {
-		let options = { maxLength: 80, indent: 2, };
-		return stringify(json, options)
-	};
+      var string = JSON.stringify(obj);
 
-	function test (json, stringify) {
-		const isNode = typeof window === 'undefined';
-		let jsonTxt = JSON.stringify(json);
-		console.log('jsonTxt:', jsonTxt);
-		let formattedJson = testStringifyPrettyCompact(json, stringify);
-		console.log('jsonTxt formatted compact:', formattedJson);
-		if (isNode === false) {
-			const elem1 = document.getElementById('json');
-			if (!elem1) console.error("json test: document.getElementById('json') failed");
-			else {
-				elem1.innerHTML = jsonTxt;
-				const elem2 = document.getElementById('formattedJson');
-				elem2.innerHTML = formattedJson;
-			}
-		}
-	}
+      if (string === undefined) {
+        return string
+      }
 
-	function stringify (obj, options) {
-	  options = options || {};
-	  var indent = JSON.stringify([1], null, get(options, 'indent', 2)).slice(2, -3);
-	  var addMargin = get(options, 'margins', false);
-	  var maxLength = (indent === '' ? Infinity : get(options, 'maxLength', 80));
+      var length = maxLength - currentIndent.length - reserved;
 
-	  return (function _stringify (obj, currentIndent, reserved) {
-	    if (obj && typeof obj.toJSON === 'function') {
-	      obj = obj.toJSON();
-	    }
+      if (string.length <= length) {
+        var prettified = prettify(string, addMargin);
+        if (prettified.length <= length) {
+          return prettified
+        }
+      }
 
-	    var string = JSON.stringify(obj);
+      if (typeof obj === 'object' && obj !== null) {
+        var nextIndent = currentIndent + indent;
+        var items = [];
+        var delimiters;
+        var comma = function (array, index) {
+          return (index === array.length - 1 ? 0 : 1)
+        };
 
-	    if (string === undefined) {
-	      return string
-	    }
+        if (Array.isArray(obj)) {
+          for (var index = 0; index < obj.length; index++) {
+            items.push(
+              _stringify(obj[index], nextIndent, comma(obj, index)) || 'null'
+            );
+          }
+          delimiters = '[]';
+        } else {
+          Object.keys(obj).forEach(function (key, index, array) {
+            var keyPart = JSON.stringify(key) + ': ';
+            var value = _stringify(obj[key], nextIndent,
+                                   keyPart.length + comma(array, index));
+            if (value !== undefined) {
+              items.push(keyPart + value);
+            }
+          });
+          delimiters = '{}';
+        }
 
-	    var length = maxLength - currentIndent.length - reserved;
+        if (items.length > 0) {
+          return [
+            delimiters[0],
+            indent + items.join(',\n' + nextIndent),
+            delimiters[1]
+          ].join('\n' + currentIndent)
+        }
+      }
 
-	    if (string.length <= length) {
-	      var prettified = prettify(string, addMargin);
-	      if (prettified.length <= length) {
-	        return prettified
-	      }
-	    }
+      return string
+    }(obj, '', 0))
+  }
 
-	    if (typeof obj === 'object' && obj !== null) {
-	      var nextIndent = currentIndent + indent;
-	      var items = [];
-	      var delimiters;
-	      var comma = function (array, index) {
-	        return (index === array.length - 1 ? 0 : 1)
-	      };
+  // Note: This regex matches even invalid JSON strings, but since we’re
+  // working on the output of `JSON.stringify` we know that only valid strings
+  // are present (unless the user supplied a weird `options.indent` but in
+  // that case we don’t care since the output would be invalid anyway).
+  var stringOrChar = /("(?:[^\\"]|\\.)*")|[:,\][}{]/g;
 
-	      if (Array.isArray(obj)) {
-	        for (var index = 0; index < obj.length; index++) {
-	          items.push(
-	            _stringify(obj[index], nextIndent, comma(obj, index)) || 'null'
-	          );
-	        }
-	        delimiters = '[]';
-	      } else {
-	        Object.keys(obj).forEach(function (key, index, array) {
-	          var keyPart = JSON.stringify(key) + ': ';
-	          var value = _stringify(obj[key], nextIndent,
-	                                 keyPart.length + comma(array, index));
-	          if (value !== undefined) {
-	            items.push(keyPart + value);
-	          }
-	        });
-	        delimiters = '{}';
-	      }
+  function prettify (string, addMargin) {
+    var m = addMargin ? ' ' : '';
+    var tokens = {
+      '{': '{' + m,
+      '[': '[' + m,
+      '}': m + '}',
+      ']': m + ']',
+      ',': ', ',
+      ':': ': '
+    };
+    return string.replace(stringOrChar, function (match, string) {
+      return string ? match : tokens[match]
+    })
+  }
 
-	      if (items.length > 0) {
-	        return [
-	          delimiters[0],
-	          indent + items.join(',\n' + nextIndent),
-	          delimiters[1]
-	        ].join('\n' + currentIndent)
-	      }
-	    }
+  function get (options, name, defaultValue) {
+    return (name in options ? options[name] : defaultValue)
+  }
 
-	    return string
-	  }(obj, '', 0))
-	}
+  /* ---------------------------------------------------------------------------------------------
+   * es6_test.js: json formatting and es6 rollup test
+   *-------------------------------------------------------------------------------------------- */
+  // const stringify = require('./node_modules/json-stringify-pretty-compact/index.js') // does not work in browsers
 
-	// Note: This regex matches even invalid JSON strings, but since we’re
-	// working on the output of `JSON.stringify` we know that only valid strings
-	// are present (unless the user supplied a weird `options.indent` but in
-	// that case we don’t care since the output would be invalid anyway).
-	var stringOrChar = /("(?:[^\\"]|\\.)*")|[:,\][}{]/g;
+  // import jsonObj from './test.json' // you need Rollup for this
+  const jsonObj = {
+  	name: 'test.json',
+  	"table": [{
+  		"record_type": [""],
+  		"table": "person"
+  	}],
+  	parameter: {
+  		"user_id": ""
+  	},
+  	field: ["per.json_data"],
+  	query: [
+  		["per.login_id", "=", "user_id"]
+  	],
+  	short_array: [1, 2, 3, 6, 7, 8],
+  	obj: {
+  		a: 123,
+  		long_array: [1, 2, 3, 6, 7, 8, 'asdasdas', 6, 7, 8, 'asdasdas', 'werwerwe', 'werwerweasdasdas'],
+  	},
+  };
 
-	function prettify (string, addMargin) {
-	  var m = addMargin ? ' ' : '';
-	  var tokens = {
-	    '{': '{' + m,
-	    '[': '[' + m,
-	    '}': m + '}',
-	    ']': m + ']',
-	    ',': ', ',
-	    ':': ': '
-	  };
-	  return string.replace(stringOrChar, function (match, string) {
-	    return string ? match : tokens[match]
-	  })
-	}
+  const testStringifyPrettyCompact = (json, stringify$$1) => {
+  	let options = {
+  		maxLength: 80,
+  		indent: 2,
+  	};
+  	return stringify$$1(json, options)
+  };
 
-	function get (options, name, defaultValue) {
-	  return (name in options ? options[name] : defaultValue)
-	}
+  function test(json, stringify$$1) {
+  	const isNode = typeof window === 'undefined';
+  	let jsonTxt = JSON.stringify(json);
+  	console.log('jsonTxt:', jsonTxt);
+  	let formattedJson = testStringifyPrettyCompact(json, stringify$$1);
+  	console.log('jsonTxt formatted compact:', formattedJson);
+  	debugger
+  	if (isNode === false) {
+  		const elem1 = document.getElementById('json');
+  		if (!elem1) console.error("json test: document.getElementById('json') failed");
+  		else {
+  			elem1.innerHTML = jsonTxt;
+  			const elem2 = document.getElementById('formattedJson');
+  			elem2.innerHTML = formattedJson;
+  		}
+  	}
+  }
 
-	/* ---------------------------------------------------------------------------------------------
-	 * es6_test.js: json formatting and es6 rollup test
-	 *-------------------------------------------------------------------------------------------- */
-	// const stringify = require('./node_modules/json-stringify-pretty-compact/index.js') // does not work in browsers
+  test(jsonObj, stringify);
 
-	// import jsonObj from './test.json' // you need Rollup for this
-	const jsonObj = {
-		name: 'test.json',
-		short_array: [1, 2, 3, 6, 7, 8],
-		obj: {
-			a: 123,
-			long_array: [1, 2, 3, 6, 7, 8, 'asdasdas', 6, 7, 8, 'asdasdas', 'werwerwe', 'werwerweasdasdas'],
-		},
-	};
+  exports.test = test;
 
-	debugger
-	test(jsonObj, stringify);
+  return exports;
 
-}());
+}({}));
