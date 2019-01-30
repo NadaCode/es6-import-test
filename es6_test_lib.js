@@ -3,17 +3,21 @@
  *-------------------------------------------------------------------------------------------- */
 
 // https://github.com/lydell/json-stringify-pretty-compact
+import stringify from './lib/json-stringify-pretty-compact.js'
 
-const testStringifyPrettyCompact = (json, stringify) => {
-	let options = { maxLength: 80, indent: 2, }
+const testStringifyPrettyCompact = (json) => {
+	let options = {
+		maxLength: 80,
+		indent: 2,
+	}
 	return stringify(json, options)
 }
 
-export function test (json, stringify) {
+export function testLibFunction(json) {
 	const isNode = typeof window === 'undefined'
 	let jsonTxt = JSON.stringify(json)
 	console.log('jsonTxt:', jsonTxt)
-	let formattedJson = testStringifyPrettyCompact(json, stringify)
+	let formattedJson = testStringifyPrettyCompact(json)
 	console.log('jsonTxt formatted compact:', formattedJson)
 	if (isNode === false) {
 		const elem1 = document.getElementById('json')

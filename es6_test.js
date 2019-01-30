@@ -2,9 +2,19 @@
  * es6_test.js: json formatting and es6 rollup test
  *-------------------------------------------------------------------------------------------- */
 
-// import { test } from './es6_test_lib.js'
-import stringify from './lib/json-stringify-pretty-compact.js'
+// import { testLibFunction } from './es6_test_lib.js'
+
 // const stringify = require('./node_modules/json-stringify-pretty-compact/index.js') // does not work in browsers
+
+// Feature detect dynamic import().
+function supportsDynamicImport() {
+	try {
+		new Function('import("")');
+		return true;
+	} catch (err) {
+		return false;
+	}
+}
 
 // import jsonObj from './test.json' // you need Rollup for this
 const jsonObj = {
@@ -27,30 +37,12 @@ const jsonObj = {
 	},
 }
 
-const testStringifyPrettyCompact = (json, stringify) => {
-	let options = {
-		maxLength: 80,
-		indent: 2,
-	}
-	return stringify(json, options)
+function testDynamic(json) {
+	import('./es6_test_lib.js').then((module) => {
+		module.testLibFunction(json)
+	}).catch((err) => {
+		alert(`dynamic import failed with error: ${err}`)
+	})
 }
 
-export function test(json, stringify) {
-	const isNode = typeof window === 'undefined'
-	let jsonTxt = JSON.stringify(json)
-	console.log('jsonTxt:', jsonTxt)
-	let formattedJson = testStringifyPrettyCompact(json, stringify)
-	console.log('jsonTxt formatted compact:', formattedJson)
-	debugger
-	if (isNode === false) {
-		const elem1 = document.getElementById('json')
-		if (!elem1) console.error("json test: document.getElementById('json') failed")
-		else {
-			elem1.innerHTML = jsonTxt
-			const elem2 = document.getElementById('formattedJson')
-			elem2.innerHTML = formattedJson
-		}
-	}
-}
-
-test(jsonObj, stringify)
+testDynamic(jsonObj)

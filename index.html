@@ -13,16 +13,44 @@
 	<noscript>
 		<h1>We're sorry but page doesn't work properly without JavaScript enabled. Please enable it to continue.</h1>
 	</noscript>
-	<script defer type="module" src="es6_test.js"></script>
-	<script defer nomodule src="bundle.js"></script>
+	<script>
+		// Feature detect static imports.
+		function supportsStaticImport() {
+			const script = document.createElement('script');
+			return 'noModule' in script;
+		}
+		// Feature detect dynamic import().
+		function supportsDynamicImport() {
+			try {
+				new Function('import("")');
+				return true;
+			} catch (err) {
+				return false;
+			}
+		}
+		// Usage.
+		let el = document.createElement('pre');
+		el.textContent = `
+Supports ES module static import: ${supportsStaticImport()}
+Supports dynamic ES module import(): ${supportsDynamicImport()}
+`
+		document.body.appendChild(el);
+	</script>
 	<!-- <script defer src="bundle.js"></script> -->
 
 	<h1>Test es6 Rollup - using es6_test.js</h1>
+	<h2><a href="https://gist.github.com/ebidel/3201b36f59f26525eb606663f7b487d0">Test dynamic import support code.</a></h2>
 	<h3>json:</h3>
 	<pre id='json'></pre>
 	<h3>formatted json, compact:</h3>
 	<pre id='formattedJson'></pre>
+	<script defer type="module" src="es6_test.js">
+		console.log('This browser supports <script type="module">')
+	</script>
+	<script defer nomodule src="bundle.js">
+		console.log('This browser DOES NOT support <script type="module">')
 
+	</script>
 </body>
 
 </html>
