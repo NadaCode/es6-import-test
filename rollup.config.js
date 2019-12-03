@@ -42,8 +42,9 @@ export default {
 	plugins: plugins,
 	input: path.join(__dirname, 'es6_test.js'), // './es6_test.js',
 	output: {
-		file: path.join(__dirname, 'bundle.js'), // './bundle.js',
-		format: 'iife', // iife, umd or cjs , all work for node
+		// file: path.join(__dirname, 'bundle.js'), // './bundle.js',
+		dir: path.join(__dirname, 'dist'),
+		format: 'esm', // iife, umd or cjs , all work for node
 		// sourcemap: process.env.NODE_ENV !== 'prod',
 		// globals: globals,
 		name: 'test_es6_rollup',

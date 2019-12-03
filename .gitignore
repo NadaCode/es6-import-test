@@ -1,6 +1,7 @@
 .DS_Store
 node_modules
 yarn.lock
+dist
 
 /tests/unit/coverage/
 /tests/e2e/videos/
