@@ -13,16 +13,28 @@
 	<noscript>
 		<h1>We're sorry but page doesn't work properly without JavaScript enabled. Please enable it to continue.</h1>
 	</noscript>
-	<script>
+	<script type="text/javascript">
+		/* var script = document.createElement('script');
+		try {
+			Function('import("")');
+			script.src = "app.js";
+			script.type = 'module';
+		} catch(e) {
+			script.src = "dist/build.js";
+			script.type = 'text/javascript';
+		}
+		document.body.appendChild(script); */
+
 		// Feature detect static imports.
 		function supportsStaticImport() {
 			const script = document.createElement('script');
 			return 'noModule' in script;
 		}
+
 		// Feature detect dynamic import().
 		function supportsDynamicImport() {
 			try {
-				new Function('import("")');
+				Function('import("")');
 				return true;
 			} catch (err) {
 				return false;
